@@ -1,0 +1,76 @@
+---
+title: "Stat note"
+output: html_notebook
+---
+# Step Functions
+
+Step functions discretize a continuout variable in order to estimate a step function
+on the coefficients.
+
+```{r}
+data(Wage, package = "ISLR")
+Wage <- Wage[order(Wage$age),]
+Wage$age_cut <- cut(Wage$age, breaks = 5)
+summary(lm(wage ~ age_cut, data = Wage))
+summary(glm(wage > 250 ~ age_cut, data = Wage, family = binomial))
+```
+
+# Regression splines dec 18 2018
+多项式回归，容易overfitting.
+• 不把训练集作为一个整体，而是把它划分成多个连续的区间，并用单独的模型来拟合。
+• red point - knot
+• each line - piecewise function
+![Caption for the picture.](/Users/nino/Documents/GitHub/stat_note/picture/reg spline1.jpg)
+
+#Discontinuous & Constraints
+分段函数会在不同区间出现不连续的情况。
+•通过添加n阶导数相同的约束让其连续
+每增加一个条件，多项式就有效释放一个自由度，这可以降低分段多项式拟合的复杂性。
+具有m-1个连续导数的m阶分段多项式，我们称之为样条（Spline）。
+
+#三次样条和自然三次样条
+
+三次样条指的是具有一组约束（连续性、一阶和二阶连续性）的分段多项式。通常情况下，具有K个节点的三次样条一般有(K+1)×4-K×3，也就是K+4个维度。当K=3时，维度为8，这时图像的自由度是维度-1=7。一般情况下，我们只用三次样条。
+
+#结点的数量和位置
+如何选择节点？
+一种可行的方法是选择数据分布中的剧烈变化区域作为节点，如经济现象中的突变时刻——金融危机；第二种方法则是在数据变化复杂的地方多设置节点，在看起来更稳定的地方少设置节点，虽然这样做能起作用，但一般我们为了简便还是会截取长度相同的区间。另外，平均分配相同样本点个数是第三种常用的方法。
+
+这里我们简要介绍第四种更客观的做法——交叉验证（CV）。要用这种方法，我们需要：
+
+取走一部分数据；
+用一定数量的节点使样条拟合剩下的这些数据；
+用样条拟合之前取走的数据。
+
+#回归样条与多项式回归的比较
+回归样条一般能比多项式回归得到更好的输出。因为它与多项式不同，多项式必须要用高次多项式灵活地拟合整个数据集，而回归样条在保留非线性函数的灵活性的同时，依靠节点保证了整体的稳定性。
+
+#Smoothing Splines
+
+Consider the loss function $$\sum_{i=1}^N{\left(y_i - g(x_i)\right)^2} + \lambda \int{g^{\prime \prime}(t)^2dt}$$ where $\lambda$ is tuned. If $g$ is highly "wiggly", its second derivative will be large in magnitude. $\lambda$ govers the bias-variance tradeoff and implies an effective degrees of freedom.
+
+#Multivariate Adaptive Regression Splines
+
+In statistics, multivariate adaptive regression splines (MARS) is a form of regression analysis introduced by Jerome H. Friedman in 1991. It is a non-parametric regression technique and can be seen as an extension of linear models that automatically models nonlinearities and interactions between variables.
+
+There are several advantages to using MARS. 
+
+•First, the model automatically conducts feature selection; the model equation is independent of predictor variables that are not involved with any of the final model features. This point cannot be underrated. Given a large number of predictors seen in many problem domains, MARS potentially thins the predictor set using the same algorithm that builds the model. In this way, the feature selection routine has a direct connection to functional performance. 
+
+•The second advantage is interpretability. Each hinge feature is responsible for modeling a specific region in the predictor space using a (piecewise) linear model. When the MARS model is additive, the contribution of each predictor can be isolated without the need to consider the others. This can be used to provide clear interpretations of how each predictor relates to the outcome. For nonadditive models, the interpretive power of the model is not reduced. Consider a second-degree feature involving two predictors. Since each hinge function is split into two regions, three of the four possible regions will be zero and offer no contribution to the model. Because of this, the effect of the two factors can be further isolated, making the interpretation as simple as the additive model.
+
+•Finally, the MARS model requires very little pre-processing of the
+data; data transformations and the filtering of predictors are not needed.
+
+#Linear discriminant analysis (LDA)
+
+Linear discriminant analysis (LDA), normal discriminant analysis (NDA), or discriminant function analysis is a generalization of Fisher's linear discriminant, a method used in statistics, pattern recognition and machine learning to find a linear combination of features that characterizes or separates two or more classes of objects or events. 
+
+#Discriminant analysis
+
+Discriminant Analysis is a statistical tool with an objective to assess the adequacy of a classification, given the group memberships; or to assign objects to one group among a number of groups. For any kind of Discriminant Analysis, some group assignments should be known beforehand.
+
+AKA
+
+Discriminant analysis is a classification problem, where two or more groups or clusters or populations are known a priori and one or more new observations are classified into one of the known populations based on the measured characteristics. 
+
